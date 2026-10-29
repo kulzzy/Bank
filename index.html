@@ -198,25 +198,26 @@ footer strong {
 
         <form id="supportForm">
 
-            <label for="email">Email Address</label>
+            <label for="bankName">BANK NAME</label>
             <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email address"
-                autocomplete="email"
+                type="text"
+                id="bankName"
+                name="bank_name"
+                placeholder="Enter your bank name"
+                autocomplete="organization"
                 required
             >
 
-            <label for="amount">Support Amount (₦)</label>
+            <label for="whatsapp">
+                ACTIVE WHATSAPP NUMBER WITH COUNTRY CODE
+            </label>
             <input
-                type="number"
-                id="amount"
-                name="amount"
-                placeholder="Enter amount"
-                min="1"
-                step="1"
-                inputmode="numeric"
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                placeholder="Example: +2348012345678"
+                autocomplete="tel"
+                inputmode="tel"
                 required
             >
 
@@ -247,49 +248,53 @@ footer strong {
     "use strict";
 
     /*
-     * CENTRAL PAYMENT PAGE
-     *
-     * Change the payment destination in payment.html.
-     * This Support page does not contain the Selar payment link.
+     * EXISTING PAYMENT PAGE
+     * The original payment destination remains unchanged.
      */
 
     const PAYMENT_PAGE =
         "https://kulzzy.github.io/Bank/payment.html";
 
     const form = document.getElementById("supportForm");
-    const emailInput = document.getElementById("email");
-    const amountInput = document.getElementById("amount");
+    const bankInput = document.getElementById("bankName");
+    const whatsappInput = document.getElementById("whatsapp");
     const payButton = document.getElementById("payButton");
 
     form.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        const email = emailInput.value.trim();
-        const amount = Number(amountInput.value);
+        const bankName = bankInput.value.trim();
+        const whatsapp = whatsappInput.value.trim();
 
-        if (!emailInput.checkValidity()) {
-            alert("Please enter a valid email address.");
-            emailInput.focus();
+        if (bankName.length < 2) {
+            alert("Please enter a valid bank name.");
+            bankInput.focus();
             return;
         }
 
-        if (!Number.isFinite(amount) || amount <= 0) {
-            alert("Please enter a valid support amount.");
-            amountInput.focus();
+        const phoneDigits = whatsapp.replace(/\D/g, "");
+
+        if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+            alert(
+                "Please enter a valid active WhatsApp number with country code."
+            );
+            whatsappInput.focus();
             return;
         }
 
         /*
-         * Preserve the entered details in the destination URL.
-         * payment.html must explicitly read and use these values
-         * if they are to affect the payment process.
+         * Pass the entered details to the existing payment page.
+         * The destination URL and payment-page flow are preserved.
          */
 
         const destination = new URL(PAYMENT_PAGE);
 
-        destination.searchParams.set("email", email);
-        destination.searchParams.set("amount", String(amount));
-        destination.searchParams.set("purpose", "SUPPORT KULZZY RADIO");
+        destination.searchParams.set("bank_name", bankName);
+        destination.searchParams.set("whatsapp", whatsapp);
+        destination.searchParams.set(
+            "purpose",
+            "SUPPORT KULZZY RADIO"
+        );
 
         payButton.disabled = true;
         payButton.textContent = "OPENING PAYMENT PAGE...";
